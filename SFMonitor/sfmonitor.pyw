@@ -71,6 +71,7 @@ class PlottingDataMonitor(QMainWindow):
     plot_scale_x = {}
     plot_scale_y = {}
     flow_props = [{} for i in range(NFLOWS)]
+    data = [[] for i in range(NFLOWS)]
     flow_value_size = 2
     flow_separator = True
     flow_trace = False
@@ -484,7 +485,7 @@ class PlottingDataMonitor(QMainWindow):
         
         self.setCentralWidget(self.main_frame)
         self.set_actions_enable_state()
-        self.create_items()
+        #self.create_items()
 
     def create_menu(self):
         # file menu
@@ -612,7 +613,6 @@ class PlottingDataMonitor(QMainWindow):
                         ( _('Draw trace'), self.flow_trace )
                        ))
 
-        print (self.flow_props)
         for idx in range(NFLOWS):
             groups.append(( ( _('Unsigned'), self.flow_props[idx].get('unsigned', True)),
                             ( _('Color'), colorToStr(self.flow_props[idx].get('color', _flow_colors[idx]) )),
@@ -634,12 +634,9 @@ class PlottingDataMonitor(QMainWindow):
                 self.flow_props[idx]['unsigned'] = results[idx+1][0]
                 self.flow_props[idx]['color'] = strToColor(results[idx+1][1])
                 self.flow_props[idx]['scatter'] = results[idx+1][2]
-                for idx in range(NFLOWS):
-                    print (idx, self.flow_props[idx])
+
                 if self.curves[idx]:
                     self.curves[idx].setPen( pg.mkPen(*self.flow_props[idx]['color']) )
-
-            print (self.flow_props, self.flow_props[0])
 
             if self.plot_mode == MD_POSITION:
                 self.show_positions(force_trace=True)
