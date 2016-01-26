@@ -23,7 +23,7 @@ shortcut_table = [
      ),
 
     ("StartupShortcut",        # Shortcut
-     "StartupFolder",          # Directory_
+     "StartMenuFolder",        # Directory_
      "SFMonitor",              # Name
      "TARGETDIR",              # Component_
      "[TARGETDIR]sfmonitor.exe",   # Target
@@ -46,8 +46,7 @@ msi_options = {
     'data':msi_data
 }
 
-#includefiles = ['locales/','locales/ru_RU','locales/ru_RU/LC_MESSAGES','locales/en_US', ,'locales/ru_RU/LC_MESSAGES/default.mo', 'locales/en_US/LC_MESSAGES/default.mo', 'settings.cfg']
-includefiles = ['locales/','settings.cfg']
+includefiles = ['locales/','settings.cfg','plot.ico']
 
 options = {
     'build_exe': {

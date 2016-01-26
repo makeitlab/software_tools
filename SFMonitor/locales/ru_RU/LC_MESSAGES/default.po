@@ -67,7 +67,7 @@ msgid "Data flows"
 msgstr "Потоки"
 
 msgid "Data flow properties"
-msgstr "Парамметры потоков"
+msgstr "Параметры потоков"
 
 msgid "Data format:"
 msgstr "Формат данных"
