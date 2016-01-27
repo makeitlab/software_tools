@@ -1,5 +1,4 @@
 #!c:\python26\python.exe
-
 import png
 import numpy
 import sys, re, os
@@ -114,6 +113,7 @@ def convert(fname, p, smul=1):
     img = Image.open(newp)
     img = img.resize((img.size[0]*smul,img.size[1]*smul), Image.ANTIALIAS)
     img.save(newp)
+    #img.close()
 
 try:
     p = os.path.join(os.getcwd(), 'png')
