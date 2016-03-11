@@ -1,0 +1,1 @@
+c:\Devel\installed\Python27\python.exe upload.py %1
