@@ -2,7 +2,6 @@
 # Modified by Bjorn Schrader
 # coding=utf-8
 
-import threading
 import time
 import os
 import sys
