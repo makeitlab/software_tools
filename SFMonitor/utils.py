@@ -1,5 +1,5 @@
-import re, itertools
-import winreg
+import re, itertools, sys, serial
+#import winreg
 
 import random, time
 import queue
@@ -16,9 +16,29 @@ def full_port_name(portname):
     if m and int(m.group(1)) < 10:
         return portname    
     return '\\\\.\\' + portname    
-    
 
 def enumerate_serial_ports():
+    if sys.platform.startswith('win'):
+        ports = ['COM%s' % (i + 1) for i in range(256)]
+    elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
+        # this excludes your current terminal "/dev/tty"
+        ports = glob.glob('/dev/tty[A-Za-z]*')
+    elif sys.platform.startswith('darwin'):
+        ports = glob.glob('/dev/tty.*')
+    else:
+        raise EnvironmentError('Unsupported platform')
+
+    result = []
+    for port in ports:
+        try:
+            s = serial.Serial(port)
+            s.close()
+            result.append(port)
+        except (OSError, serial.SerialException):
+            pass
+    return result
+
+def enumerate_serial_ports_dep():
     """ Uses the Win32 registry to return an 
         iterator of serial (COM) ports 
         existing on this computer.
@@ -77,30 +97,34 @@ def get_item_from_queue(Q, timeout=0.01):
     
     return item
 
-def join_bytes(bytes, unsigned, size):
+def join_bytes(value, unsigned, size):
     if unsigned:
         if size == 1:
-            return ushort8(bytes[0])
+            return to_uint8(value)
         elif size == 2:
-            return ushort16(bytes[0] + (bytes[1]<<8))
+            return to_uint16(value)
+        elif size == 4:
+            return to_uint32(value)
     else:
         if size == 1:
-            return short8(bytes[0])
+            return to_int8(value)
         elif size == 2:
-            return short16(bytes[0] + (bytes[1]<<8))
+            return to_int16(value)
+        elif size == 4:
+            return to_int32(value)
 
 def typecast(v, unsigned=1):
     if unsigned:
-        return ushort8(v)
+        return to_uint8(v)
     else:
-        return short8(v)
+        return to_int8(v)
 
-def ushort8(x):
+def to_uint8(x):
     if x>0xFF:
         raise OverflowError
     return x
 
-def short8(x):
+def to_int8(x):
     if x>0xFF:
         raise OverflowError
     if x>0x7F:
@@ -111,12 +135,12 @@ def short8(x):
             return -128
     return x
 
-def ushort16(x):
+def to_uint16(x):
     if x>0xFFFF:
         raise OverflowError
     return x
 
-def short16(x):
+def to_int16(x):
     if x>0xFFFF:
         raise OverflowError
     if x>0x7FFF:
@@ -125,6 +149,22 @@ def short16(x):
             return -x
         else:
             return -32768
+    return x
+
+def to_uint32(x):
+    if x>0xFFFFFFFF:
+        raise OverflowError
+    return x
+
+def to_int32(x):
+    if x>0xFFFFFFFF:
+        raise OverflowError
+    if x>0x7FFFFFFF:
+        x=int(0x100000000-x)
+        if x<2147483648:
+            return -x
+        else:
+            return -2147483648
     return x
 
 def strToColor(s):

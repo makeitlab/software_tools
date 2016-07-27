@@ -46,7 +46,7 @@ msi_options = {
     'data':msi_data
 }
 
-includefiles = ['locales/','settings.cfg','plot.ico']
+includefiles = ['SerialFlow/','locales/','settings.cfg','plot.ico']
 
 options = {
     'build_exe': {
@@ -62,7 +62,7 @@ executables = [
 
 setup(
     name = "SFMonitor",
-    version = "1.1",
+    version = "1.2",
     description = "Serial flow monitor",
     author = "MakeItLab",
     author_email = "hackspace@makeitlab.ru",

@@ -1,6 +1,6 @@
 """ 
 Serial Flow Monitor (SFMonitor) - Serial port monitor for robotic purposes.
-Version: 1.1
+Version: 1.2
 Home page: www.poprobot.ru/soft/sfmonitor
 
 Oleg Evsegneev (oleg.evsegneev@gmail.com)
@@ -66,6 +66,7 @@ class PlottingDataMonitor(QMainWindow):
 
     data_format = DEFAULT_DATA_FORMAT
     port_name = 0
+    port_name_opened = None
     baud_rate = 0
     plot_page = DEFAULT_PLOT_PAGE
     plot_scale_x = {}
@@ -142,8 +143,8 @@ class PlottingDataMonitor(QMainWindow):
 
         # Flow props
         self.flow_value_size = int(cget('Flow', 'value_size', fallback=DEFAULT_FLOW_VALUE_SIZE))
-        self.flow_separator = bool(cget('Flow', 'separator', fallback=DEFAULT_FLOW_VALUE_SEPARATOR))
-        self.flow_trace = bool(cget('Flow', 'trace', fallback=DEFAULT_FLOW_TRACE))
+        self.flow_separator = cget('Flow', 'separator', fallback=DEFAULT_FLOW_VALUE_SEPARATOR)=='True' and True or False
+        self.flow_trace = cget('Flow', 'trace', fallback=DEFAULT_FLOW_TRACE)=='True' and True or False
 
         for idx in range(NFLOWS):
             self.flow_props[idx]['unsigned'] = cget('Flow', 'unsigned_%d' % idx, fallback=DEFAULT_FLOW_UNSIGNED)=='True' and True or False
@@ -361,7 +362,7 @@ class PlottingDataMonitor(QMainWindow):
         # port name
         self.portname_l, self.portname_ = self.create_info_box(_('Port name:'), 15)
         if self.port_name and self.baud_rate:
-            self.portname_.setText('%s (%s)' % (self.port_name, self.baud_rate))
+            self.portname_.setText('%s (%s)' % (self.port_name, _baud_rates[self.baud_rate]))
         
         port_layout.addWidget(self.portname_l)
         port_layout.addWidget(self.portname_, 0)
@@ -513,9 +514,10 @@ class PlottingDataMonitor(QMainWindow):
 
         # help menu
         self.help_menu = self.menuBar().addMenu(_("Help"))
-        self.about_action = self.create_action(_("About"), shortcut='F1', slot=self.on_about)
+        self.about_action = self.create_action(_("About"), slot=self.on_about)
+        self.manual_action = self.create_action(_("Manual"), shortcut='F1', slot=self.on_manual)
         
-        self.add_actions(self.help_menu, (self.about_action,))
+        self.add_actions(self.help_menu, (self.about_action, self.manual_action))
 
     def set_actions_enable_state(self):
         if self.check_port(self.port_name) and self.baud_rate:
@@ -564,15 +566,26 @@ class PlottingDataMonitor(QMainWindow):
         self.create_items()
             
     def on_about(self):
-        #msg = __doc__
-        msg = _('Serial Flow Monitor (SFMonitor) - Serial port monitor for robotic purposes.'+'\n')
-        msg += _('Version') + ': 1.1\n'
+        msg = _('Serial Flow Monitor (SFMonitor) - Serial port monitor for robotic purposes.')+'\n'
+        msg += _('Version') + ': 1.2\n'
         msg += _('Home page') + ': www.poprobot.ru/soft/sfmonitor\n'
-        msg += _('Online manual') + ': www.robotclass.ru\n'
-        msg += _('Source repository') + ': www.github.ru\n'
+        msg += _('Online manual') + ': robotclass.ru\n'
+        msg += _('Source repository') + ': github.com/makeitlab/software_tools/tree/master/SFMonitor\n'
         msg += _('Author') + ': Oleg Evsegneev (oleg.evsegneev@gmail.com)\n'
         msg += _('Original concept') + ': Eli Bendersky (eliben@gmail.com)\n'
         QMessageBox.about(self, _("About the SFMonitor"), msg)
+
+    def on_manual(self):
+        msg = _('Protocol specification')+'\n'
+        msg += _('begin data_1 [separator] data_2 ... data_N end')+'\n'
+        msg += _('- begin: 0x12')+'\n'
+        msg += _('- end: 0x13')+'\n'
+        msg += _('- escape: 0x7D')+'\n'
+        msg += _('- separator (optional): 0x10')+'\n\n'
+        msg += _('Data size: 1, 2 or 4 bytes')+'\n\n'
+        msg += _('Example packet: two 16bit numbers 5 and 758, with separator')+':\n'
+        msg += _('0x12 0x00 0x05 0x10 0x02 0xF6 0x13')
+        QMessageBox.about(self, _("Protocol manual"), msg)
 
     def on_set_scale(self):
         groups = []
@@ -671,6 +684,7 @@ class PlottingDataMonitor(QMainWindow):
         self.monitor_active = False
         self.timer.stop()
         self.set_actions_enable_state()
+        self.port_name_opened = None
 
         self.status = 'Monitor idle'
         self.status_text.setText(_( self.status))
@@ -703,6 +717,7 @@ class PlottingDataMonitor(QMainWindow):
                 com_error)
             self.com_monitor = None
 
+        self.port_name_opened = self.port_name
         self.monitor_active = True
         self.set_actions_enable_state()
 
@@ -822,6 +837,7 @@ class PlottingDataMonitor(QMainWindow):
             # Complex 1
             if df == FMT_COMPLEX_VT:
                 for d in qdata:
+                    #print (d)
                     # cycle flows
                     for i,flow in enumerate(d[1]):
                         value = join_bytes(flow, self.flow_props[i]['unsigned'], self.flow_value_size)
@@ -875,7 +891,7 @@ class PlottingDataMonitor(QMainWindow):
         return action
 
     def check_port( self, name ):
-        return name in list(enumerate_serial_ports())
+        return name in list(enumerate_serial_ports()) + [self.port_name_opened]
 
     def refresh_texts( self ):
         self.update_freq_l.setText(_('Update frequency = %s (Hz)') % self.update_freq.value())

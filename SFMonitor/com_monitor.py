@@ -10,6 +10,7 @@ Eli Bendersky (eliben@gmail.com)
 
 import threading
 import time
+from SerialFlow.SerialFlow import SerialFlow
 
 import serial
 
@@ -50,19 +51,15 @@ class ComMonitorThread(threading.Thread):
                     data_q, error_q,
                     port_num,
                     port_baud,
-                    port_stopbits=serial.STOPBITS_ONE,
-                    port_parity=serial.PARITY_NONE,
                     port_timeout=0.01,
                     data_format=None,
                     value_size=2,
                     separator=1):
         threading.Thread.__init__(self)
 
-        self.serial_port = None
+        self.sf = None
         self.serial_arg = dict( port=port_num,
                                 baudrate=port_baud,
-                                stopbits=port_stopbits,
-                                parity=port_parity,
                                 timeout=port_timeout)
 
         self.data_q = data_q
@@ -77,66 +74,33 @@ class ComMonitorThread(threading.Thread):
 
     def run(self):
         try:
-            if self.serial_port:
-                self.serial_port.close()
-            self.serial_port = serial.Serial(**self.serial_arg)
+            if self.sf is not None:
+                self.sf.close()
+            self.sf = SerialFlow(**self.serial_arg)
         except serial.IOError as e:
             self.error_q.put(e.message)
             return
 
+        if self.data_format == FMT_SIMPLE:
+            self.sf.setPacketFormat(1, 0, 0)
+        elif self.data_format in (FMT_COMPLEX_VT, FMT_COMPLEX_YX):
+            self.sf.setPacketFormat(self.value_size, 3, self.separator)
+
         # Restart the clock
         tshift = time.clock()
-        df = self.data_format
-        escape = False
-        collecting = False
-        frame_buffer = [[]]
         while self.alive.isSet():
-            # Reading 1 byte, followed by whatever is left in the
-            # read buffer, as suggested by the developer of
-            # PySerial.
-            #
-            data = self.serial_port.read(1)
-            data += self.serial_port.read(self.serial_port.inWaiting())
-
             timestamp = time.clock() - tshift
-            if len(data) > 0:
-                if df == FMT_SIMPLE:
-                    self.data_q.put((timestamp, data[-1]))
-                elif df in (FMT_COMPLEX_VT, FMT_COMPLEX_YX):
-                    for d in data:
-                        d_ = d
-                        if collecting:
-                            if escape:
-                                frame_buffer[-1].append(d)
-                                if not self.separator and len(frame_buffer[-1]) == self.value_size:
-                                    frame_buffer.append([])
-                                escape = False
-                            # escape
-                            elif d_ == 0x7D:
-                                escape = True
-                            # value separator
-                            elif self.separator and d_ == 0x10:
-                                frame_buffer.append([])
-                            # end
-                            elif d_ == 0x13:
-                                if not self.separator:
-                                    frame_buffer = frame_buffer[:-1]
-                                self.data_q.put((timestamp, frame_buffer))
-                                collecting = False
-                                v_idx = 0
-                            else:
-                                frame_buffer[-1].append(d)
-                                if not self.separator and len(frame_buffer[-1]) == self.value_size:
-                                    frame_buffer.append([])
-                        # begin
-                        elif d_ == 0x12:
-                            frame_buffer = []
-                            frame_buffer.append([])
-                            collecting = True
+            if self.data_format == FMT_SIMPLE:
+                bt = self.sf.receiveByte()
+                if bt is not None:
+                    self.data_q.put((timestamp, bt))
+            elif self.data_format in (FMT_COMPLEX_VT, FMT_COMPLEX_YX):
+                if self.sf.receivePacket():
+                    self.data_q.put((timestamp, self.sf.listPacketValues()))
 
         # clean up
-        if self.serial_port:
-            self.serial_port.close()
+        if self.sf is not None:
+            self.sf.close()
 
     def join(self, timeout=None):
         self.alive.clear()
