@@ -1,0 +1,164 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Messages\n"
+"POT-Creation-Date: 2015-10-02 14:05+YEKT\n"
+"PO-Revision-Date: 2015-10-02 14:05+YEKT\n"
+"Last-Translator: <>\n"
+"Language-Team: ru <>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Language: ru_RU\n"
+"X-Source-Language: C\n"
+
+msgid "About"
+msgstr "О программе"
+
+msgid "About the SFMonitor"
+msgstr "О программе"
+
+msgid "Are you sure to quit?"
+msgstr "Вы действительно желаете выйти?"
+
+msgid "Author"
+msgstr "Автор"
+
+msgid "Baud rate"
+msgstr "Скорость порта"
+
+msgid "Break port"
+msgstr "Остановить порт"
+
+msgid "COM monitor thread error"
+msgstr "Ошибка монитора COM порта"
+
+msgid "COM port"
+msgstr "COM порт"
+
+msgid "COM port error"
+msgstr "Ошибка COM порта"
+
+msgid "Can't create serial connection. Try again."
+msgstr "Не удается подключиться к порту. Попробуйте снова."
+
+msgid "Common"
+msgstr "Общие"
+
+msgid "Data"
+msgstr "Данные"
+
+
+msgid "Example packet: two 16bit numbers 5 and 758, with separator"
+msgstr "Пример пакета: два 16-битных числа 5 и 758, с разделителем"
+
+msgid "Exit"
+msgstr "Выход"
+
+msgid "File"
+msgstr "Файл"
+
+msgid "Help"
+msgstr "Помощь"
+
+msgid "Home page"
+msgstr "Домашняя страница"
+
+msgid "Language"
+msgstr "Язык"
+
+msgid "Language selection"
+msgstr "Выбор языка"
+
+msgid "Manual"
+msgstr "Инструкция"
+
+msgid "Monitor idle"
+msgstr "Стоим, ничего не делаем"
+
+msgid "Monitor running"
+msgstr "Читаем данные из порта"
+
+msgid "I/O Error"
+msgstr "Ошибка ввода/вывода"
+
+msgid "No serial ports found"
+msgstr "Не найдены COM порты"
+
+msgid "Online manual"
+msgstr "Онлайн инструкция"
+
+msgid "Original concept"
+msgstr "Исходная идея"
+
+msgid "Port"
+msgstr "Порт"
+
+msgid "Port name:"
+msgstr "Порт:"
+
+msgid "Preferences"
+msgstr "Настройки"
+
+msgid "Protocol specification"
+msgstr "Спецификация протокола"
+
+msgid "Radiation"
+msgstr "Радиация"
+
+msgid "Reset"
+msgstr "Сброс"
+
+msgid "Select"
+msgstr "Выбрать порт"
+
+msgid "Select COM port"
+msgstr "Выбор COM порта"
+
+msgid "Serial Flow Monitor (SFMonitor) - Serial port monitor for robotic purposes."
+msgstr "Монитор последовательного порта (SFMonitor) - инструмент для анализа потоков данных из последовательного порта."
+
+msgid "Simple"
+msgstr "Простой"
+
+msgid "Source repository"
+msgstr "Исходные коды"
+
+msgid "Start"
+msgstr "Запустить"
+
+msgid "Start monitor"
+msgstr "Запуск монитора"
+
+msgid "Station"
+msgstr "Станция"
+
+msgid "Stop"
+msgstr "Остановить"
+
+msgid "Stop monitor"
+msgstr "Остановка монитора"
+
+msgid "Temperature"
+msgstr "Температура"
+
+msgid "Time"
+msgstr "Время"
+
+msgid "Version"
+msgstr "Версия"
+
+msgid "begin"
+msgstr "начало"
+
+msgid "begin data_1 [separator] data_2 ... data_N end"
+msgstr "начало число_1 [разделитель] число_2 .. число_N конец"
+
+msgid "end"
+msgstr "конец"
+
+msgid "escape"
+msgstr "экранирующий символ"
+
+msgid "separator"
+msgstr "разделитель"
