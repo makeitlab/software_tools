@@ -1,7 +1,5 @@
 import serial
 
-MAX_PACKET_SIZE = 128
-
 def _join_bytes( bs ):
     v = 0
     x = 0
@@ -30,8 +28,6 @@ class SerialFlow():
                   stopbits=serial.STOPBITS_ONE, 
                   timeout=None ):
         self._serial = serial.Serial( port, baudrate, parity=parity, stopbits=stopbits, timeout=timeout )
-        self._vs = [0]*MAX_PACKET_SIZE
-        self._vr = [0]*MAX_PACKET_SIZE
 
     def close( self ):
         self._serial.close()
@@ -42,6 +38,9 @@ class SerialFlow():
         self._v_length = v_length
         self._vs_idx = 0
         self._vr_idx = 0
+
+        self._vs = [0]*p_size
+        self._vr = [0]*p_size
 
     def setPacketValue( self, value ):
         if self._vs_idx < self._p_size:
